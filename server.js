@@ -1,15 +1,8 @@
 //imports
-const express = require("express");
 const mysql = require("mysql2");
 const inquirer = require("inquirer");
-
-//connnect to port
-const PORT = process.env.PORT || 3001;
-const app = express();
-
-//middleware
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
+const { makeQuery } = require("./util/makeQuery.js");
+const { question } = require("./util/question.js");
 
 //connect to database
 const db = mysql.createConnection(
@@ -23,12 +16,21 @@ const db = mysql.createConnection(
   },
   console.log(`Connected to the courses_db database.`)
 );
+console.log(question);
+//Menu selections
+const selections = {
+  type: "list",
+  name: "selections",
+  message: "Please choose one of the following options",
+  choices: question,
+};
 
 //boiler plate response for any other request (Not Found)
-app.use((req, res) => {
-  res.status(404).end();
-});
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+//init function
+init = () => {
+  inquirer.prompt(selections).then((response) => makeQuery(response));
+};
+
+//envoke init
+init();
