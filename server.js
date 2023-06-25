@@ -25,8 +25,6 @@ const selections = {
   choices: question,
 };
 
-//boiler plate response for any other request (Not Found)
-
 //init function
 init = () => {
   inquirer.prompt(selections).then((response) => makeQuery(response));
