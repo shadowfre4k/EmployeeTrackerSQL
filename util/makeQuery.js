@@ -1,5 +1,4 @@
 const { question } = require("./question.js");
-
 const {
   viewAllDepartments,
   viewAllRoles,
@@ -12,9 +11,11 @@ const {
 
 const makeQuery = (selected) => {
   let answer = selected.selections;
+
   switch (answer) {
     case question[0]:
-      viewAllDepartments();
+      viewAllDepartments().then(() => init());
+
       break;
 
     case question[1]:

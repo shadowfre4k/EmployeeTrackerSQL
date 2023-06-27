@@ -1,50 +1,36 @@
-const mysql = require("mysql2");
+const mysql = require("mysql2/promise");
 const inquirer = require("inquirer");
+const cTable = require("console.table");
+let db;
 
-const db = mysql.createConnection(
-  {
+async function main() {
+  db = await mysql.createConnection({
     host: "localhost",
     // MySQL username,
     user: "root",
     // MySQL password
     password: "1234",
     database: "employees_db",
-  },
-  console.log(`Connected to the employees_db database.`)
-);
-
-//view all departments
-let viewAllDepartments = () =>
-  db.query(`SELECT * FROM department;`, function (err, results) {
-    console.table(results);
-    if (err) {
-      console.log(err);
-    }
   });
+}
+
+main();
+//view all departments
+const viewAllDepartments = () =>
+  db.query(`SELECT * FROM department;`).then(([res]) => console.table(res));
 
 //view all roles
-let viewAllRoles = () =>
-  db.query(`SELECT title FROM roles;`, function (err, results) {
-    console.table(results);
-    if (err) {
-      console.log(err);
-    }
-  });
+const viewAllRoles = () =>
+  db.query(`SELECT title FROM roles;`).then(([res]) => console.table(res));
 
 // view all employees
-let viewAllemployees = () =>
-  db.query(
-    `SELECT first_name, last_name FROM employee;`,
-    function (err, results) {
-      console.table(results);
-      if (err) {
-        console.log(err);
-      }
-    }
-  );
+const viewAllemployees = () =>
+  db
+    .query(`SELECT first_name,last_name FROM employee;`)
+    .then(([res]) => console.table(res));
 
 //add a department
-let addDepartment = () => {
+const addDepartment = () => {
   const departmentRequest = {
     type: "input",
     name: "requestedName",
@@ -54,18 +40,14 @@ let addDepartment = () => {
   inquirer.prompt(departmentRequest).then((response) => {
     const sql = `INSERT INTO department (names) VALUES ("${response.requestedName}");`;
 
-    db.query(sql, function (err, res) {
-      viewAllRoles();
-      console.log("successfully added");
-      init();
-    });
+    db.query(sql).then(() => viewAllDepartments());
   });
 };
 
 //add a role
-let addRole = (role) => {
+const addRole = (role) => {
   db.query(
-    `INSERT INTO role (title, salaray, department_id) VALUES (${role.requestedName}, ${role.requestedSalary},${role.requestedDepartment})`,
+    `INSERT INTO departments (title, salaray, department_id) VALUES (${role.requestedName}, ${role.requestedSalary},${role.requestedDepartment});`,
     function (err, results) {
       console.log(results);
     }
@@ -73,7 +55,7 @@ let addRole = (role) => {
 };
 
 // add an employee
-let addEmployee = (employee) => {
+const addEmployee = (employee) => {
   db.query(
     `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (${employee.requestedFirstName},${employee.requestedLastName},${employee.requestRole},${employee.requestManagerId})`,
     function (err, results) {
@@ -83,7 +65,7 @@ let addEmployee = (employee) => {
 };
 
 //update an employee role
-let updateEmployeeRole = (employee) => {
+const updateEmployeeRole = (employee) => {
   db.query(
     //add queries
     ` VALUES (${employee.updateEmployee},${employee.updatedRole}`,
