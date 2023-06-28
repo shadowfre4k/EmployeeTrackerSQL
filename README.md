@@ -8,7 +8,7 @@ this app allows us to do multiple different things with our database such as vie
 ## Table of Contents
 
 - [Installation](#installation)
-- [Repositories]
+- [Repositories](#repositories)
 - [Usage](#usage)
 - [Credits](#credits)
 - [License](#license)
