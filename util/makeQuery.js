@@ -19,42 +19,20 @@ const makeQuery = (selected) => {
       break;
 
     case question[1]:
-      viewAllRoles();
+      viewAllRoles().then(() => init());
       break;
 
     case question[2]:
-      viewAllemployees();
+      viewAllemployees().then(() => init());
       break;
 
     case question[3]:
-      addDepartment();
+      addDepartment().then(() => init());
 
       break;
 
     case question[4]:
-      const roleRequest = [
-        {
-          type: "input",
-          name: "requestedName",
-          message: "What is the name of the new role?",
-        },
-        {
-          type: "input",
-          name: "requestedSalary",
-          message: "How much is the salary of that role",
-        },
-        {
-          type: "list",
-          name: "requestedDepartment",
-          message: "which department does this role belong to?",
-
-          //insert  all departments
-          choices: [],
-        },
-      ];
-      inquirer.prompt(roleRequest).then((response) => {
-        addRole(response);
-      });
+      addRole();
 
       break;
 
