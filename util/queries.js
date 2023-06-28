@@ -25,9 +25,9 @@ const viewAllRoles = () =>
   db.query(`SELECT title FROM roles;`).then(([res]) => console.table(res));
 
 // view all employees
-const viewAllemployees = () =>
+const viewAllEmployees = () =>
   db
-    .query(`SELECT first_name,last_name FROM employee;`)
+    .query(`SELECT first_name, last_name FROM employee;`)
     .then(([res]) => console.table(res));
 
 //add a department
@@ -47,8 +47,7 @@ const addDepartment = async () => {
 
 //add a role
 const addRole = async () => {
-  let [departments] = await db.query("SELECT * FROM department;");
-  console.log(departments);
+  const [departments] = await db.query("SELECT * FROM department;");
   const roleRequest = [
     {
       type: "input",
@@ -74,7 +73,6 @@ const addRole = async () => {
   ];
 
   await inquirer.prompt(roleRequest).then((response) => {
-    console.log(response);
     const sql = `INSERT INTO  roles (title, salary, department_id) VALUES ("${response.requestedRole}","${response.requestedSalary}","${response.requestedDepartment}");`;
 
     return db.query(sql).then(() => viewAllRoles());
@@ -82,33 +80,66 @@ const addRole = async () => {
 };
 
 // add an employee
-const addEmployee = (employee) => {
-  db.query(
-    `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (${employee.requestedFirstName},${employee.requestedLastName},${employee.requestRole},${employee.requestManagerId})`,
-    function (err, results) {
-      console.log(results);
-    }
-  );
+const addEmployee = async () => {
+  const [roles] = await db.query("SELECT * FROM roles ;");
+
+  const employeeRequest = [
+    {
+      type: "input",
+      name: "requestedFirst",
+      message: "What is the first name of the new employee?",
+    },
+    {
+      type: "input",
+      name: "requestedLast",
+      message: "What is the last name of the new employee?",
+    },
+    {
+      type: "list",
+      name: "requestedRole",
+      message: "What is the new employee's role?",
+      choices: roles.map((rolesId) => {
+        return {
+          value: rolesId.id,
+          title: rolesId.title,
+        };
+      }),
+    },
+
+    // {
+    //   type: "list",
+    //   name: "requestedManager",
+    //   message: "Which is this employees manager?",
+    //   choices: managers.map((managerId) => {
+    //     return {
+    //       id: managerId.id,
+    //       value: managerId.first_name,
+    //       lastName: managerId.last_name,
+    //     };
+    //   }),
+    // },
+  ];
+
+  await inquirer.prompt(employeeRequest).then((response) => {
+    console.log();
+    const sql = `INSERT INTO  employee (first_name,last_name,role_id,manager_id) VALUES ("${response.requestedFirst}","${response.requestedLast}","${response.requestedRole}","${response.requestedManager}");`;
+
+    return db.query(sql).then(() => viewAllEmployees());
+  });
 };
 
 //update an employee role
-const updateEmployeeRole = (employee) => {
-  db.query(
-    //add queries
-    ` VALUES (${employee.updateEmployee},${employee.updatedRole}`,
-    function (err, results) {
-      console.log(results);
-    }
-  );
-};
+// const updateEmployeeRole = async () => {
+//   //add queries
+// };
 //exit program
 
 module.exports = {
   viewAllDepartments,
   viewAllRoles,
-  viewAllemployees,
+  viewAllEmployees,
   addDepartment,
   addRole,
   addEmployee,
-  updateEmployeeRole,
+  // updateEmployeeRole,
 };
